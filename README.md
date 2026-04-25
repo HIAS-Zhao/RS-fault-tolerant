@@ -53,7 +53,7 @@ protect(model, layer=["YOUR_VULNERABILITY_LAYERS"], device="cuda")
 recover(model, layer=["YOUR_VULNERABILITY_LAYERS"], device="cuda")
 ```
 
-###ZMORP
+### ZMORP
 
 ```python
 from zmorp_little_model import ZMORP
