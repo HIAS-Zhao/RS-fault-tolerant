@@ -4,7 +4,7 @@ This repository contains the PyTorch implementations accompanying **VHPS**, a ha
 
 ## Overview
 
-VHPS combines two complementary protection components:
+**VHPS** combines two complementary protection components:
 
 - **ZMORP** — Zero-Memory-Overhead Redundancy Protection. It encodes a redundant copy of the exponent's low bits along with parity checks into unused mantissa bits, enabling bit exponent error detection and correction without expanding the parameter footprint.
 - **FRP** — Full Redundancy Protection. A coding-theoretic method that encodes each weight value into a longer codeword capable of correcting up to **3 bit errors** per codeword.
