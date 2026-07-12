@@ -26,6 +26,14 @@ def inject_error_to_tensor(tensor, error_rate=1e-6, seed=None, chunk_size=2048*2
         bit_width = 64
         int_dtype = torch.int64
         working_dtype = torch.float64
+    elif dtype_orig == torch.int16:
+        bit_width = 16
+        int_dtype = torch.int16
+        working_dtype = torch.int16
+    elif dtype_orig == torch.int32:
+        bit_width = 32
+        int_dtype = torch.int32
+        working_dtype = torch.int32
     elif dtype_orig == torch.int64:
         bit_width = 64
         int_dtype = torch.int64
