@@ -83,3 +83,6 @@ def inject_error_to_model(model, ber=1e-6, seed=1024, chunk_size=2048*2048):
                 if hasattr(module, 'weight') and module.weight is not None:
                     corrupted_weight = inject_error_to_tensor(module.weight.data.clone(), error_rate=ber, seed=seed)
                     module.weight.data.copy_(corrupted_weight)
+                if hasattr(module, 'bias') and module.bias is not None:
+                    corrupted_weight = inject_error_to_tensor(module.bias.data.clone(), error_rate=ber, seed=seed)
+                    module.bias.data.copy_(corrupted_weight)
