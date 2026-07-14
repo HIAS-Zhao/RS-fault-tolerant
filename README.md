@@ -1,5 +1,4 @@
-# VHPS: Vulnerability-Aware Hybrid Protection for Remote Sensing Models
-
+# VHPS: A Vulnerability-Aware Hybrid Protection Framework for Space-Borne Remote Sensing Models
 Official PyTorch implementation of **VHPS**, an algorithm-level fault-tolerance framework that protects the weights of space-borne remote sensing models against radiation-induced bit flips.
 
 > **Paper status:** *VHPS: A Vulnerability-Aware Hybrid Protection Framework for Space-Borne Remote Sensing Models* has been submitted to **IEEE Transactions on Geoscience and Remote Sensing (TGRS)**.  
