@@ -81,7 +81,7 @@ Use the fault injector to evaluate an unprotected or protected model under a con
 ```python
 from eject_error import inject_error_to_model
 
-inject_error_to_model(model, ber=BER, seed=SEED)
+inject_error_to_model(model, ber=BER)
 ```
 
 ### 2. Protect and recover with VHPS
