@@ -1,86 +1,131 @@
-# RS-fault-tolerant
+# VHPS: Vulnerability-Aware Hybrid Protection for Remote Sensing Models
 
-This repository contains the PyTorch implementations accompanying **VHPS**, a hardware fault-tolerance framework for protecting neural network model weights against bit errors.
+Official PyTorch implementation of **VHPS**, an algorithm-level fault-tolerance framework that protects the weights of space-borne remote sensing models against radiation-induced bit flips.
 
-## Paper
+> **Paper status:** *VHPS: A Vulnerability-Aware Hybrid Protection Framework for Space-Borne Remote Sensing Models* has been submitted to **IEEE Transactions on Geoscience and Remote Sensing (TGRS)**.  
+> **Manuscript:** [Download the submitted PDF](./VHPS_TGRS_manuscript.pdf)
 
-Our paper, **"VHPS: A Vulnerability-Aware Hybrid Protection Framework for Space-Borne Remote Sensing Models,"** has been submitted to *IEEE Transactions on Geoscience and Remote Sensing (TGRS)*.
+## Why VHPS?
 
-The submitted manuscript is available in this repository.
+Neural networks deployed on satellites operate in radiation-prone environments. Even a small number of bit flips in model weights can propagate through the network and cause severe performance degradation across segmentation, super-resolution, object detection, and multimodal understanding tasks.
 
-## Overview
+<p align="center">
+  <img src="assets/radiation-impact.png" width="82%" alt="Impact of radiation-induced bit flips without protection">
+</p>
 
-**VHPS** combines two complementary protection components:
+VHPS protects a model according to the vulnerability of its modules instead of applying the same level of redundancy everywhere. It combines two complementary mechanisms:
 
-- **ZMORP** — Zero-Memory-Overhead Redundancy Protection. It encodes a redundant copy of the exponent's low bits along with parity checks into unused mantissa bits, enabling bit exponent error detection and correction without expanding the parameter footprint.
-- **FRP** — Full Redundancy Protection. A coding-theoretic method that encodes each weight value into a longer codeword capable of correcting up to **3 bit errors** per codeword.
+- **ZMORP — Zero-Memory-Overhead Redundancy Protection.** Stores parity and redundant exponent information inside available mantissa bits, enabling exponent-error detection and recovery without increasing the parameter footprint.
+- **FRP — Full Redundancy Protection.** Encodes each protected weight into a longer codeword and can correct up to **three bit errors per codeword**.
+- **Vulnerability-aware hybrid protection.** Assigns FRP to the most vulnerable modules and ZMORP to moderately vulnerable modules, balancing robustness and storage cost.
 
-The two schemes are applied to different layers of the same model, forming the complete VHPS protection pipeline.
+## Method at a Glance
 
-## File Structure
+### ZMORP
+
+ZMORP reuses selected mantissa bits to hold lightweight error-correction information. At recovery time, parity checks detect corruption and the redundant exponent bits restore the protected value.
+
+<p align="center">
+  <img src="assets/zmorp-framework.png" width="100%" alt="Zero-Memory-Overhead Redundancy Protection framework">
+</p>
+
+### FRP
+
+FRP appends parity codes to the original weight representation. When radiation-induced bit flips corrupt the stored codeword, the decoder uses this redundancy to correct the errors and recover the protected parameter.
+
+<p align="center">
+  <img src="assets/frp-framework-diagram.png" width="78%" alt="Full Redundancy Protection framework">
+</p>
+
+Together with module-level vulnerability analysis, ZMORP and FRP form the complete VHPS pipeline. Protection and recovery are performed entirely at the algorithm level and do not require hardware self-checking support.
+
+## Qualitative Results
+
+The following examples cover four representative remote sensing tasks under a high bit-error rate. Without protection, corrupted weights lead to missing segmentation regions, degraded reconstruction, incorrect detections, and broken multimodal responses. VHPS substantially restores the original outputs.
+
+<p align="center">
+  <img src="assets/qualitative-results.png" width="58%" alt="Qualitative comparison of remote sensing models with and without VHPS">
+</p>
+
+## Repository Structure
 
 | File | Description |
-|------|-------------|
-| `eject_error.py` | Bit error injection utility for evaluation. Simulates hardware BER (Bit Error Rate) by randomly flipping bits in model weights. |
-| `zmorp_little_model.py` | ZMORP standalone implementation for **small** models. |
-| `zmorp_large_model.py` | ZMORP standalone implementation for **large** models. |
-| `frp_little_model.py` | FRP standalone implementation for **small** models.. |
-| `frp_large_model.py` | FRP standalone implementation for **large** models.. |
-| `vhps_little_model.py` | Combined VHPS for **small** models (ZMORP + FRP applied to different layers). |
-| `vhps_large_model.py` | Combined VHPS for **large** models (ZMORP + FRP applied to different layers). |
+| --- | --- |
+| `eject_error.py` | Injects random bit errors into model weights for evaluation at a specified bit-error rate (BER). |
+| `zmorp_little_model.py` | Standalone ZMORP implementation for small models. |
+| `zmorp_large_model.py` | Standalone ZMORP implementation for large models. |
+| `frp_little_model.py` | Standalone FRP implementation for small models. |
+| `frp_large_model.py` | Standalone FRP implementation for large models. |
+| `vhps_little_model.py` | Combined VHPS pipeline for small models. |
+| `vhps_large_model.py` | Combined VHPS pipeline for large models. |
 
+Use the `little` implementation for smaller networks and the `large` implementation for models that require the corresponding large-model protection path.
 
+## Requirements
 
+- Python 3.10+
+- PyTorch (CUDA is recommended)
+- tqdm
 
+Install the runtime dependencies with:
 
-## Usage
+```bash
+pip install torch tqdm
+```
 
+## Quick Start
 
-### Error Injection (`eject_error.py`)
+### 1. Inject bit errors
 
-Used to benchmark protection schemes under simulated hardware faults:
+Use the fault injector to evaluate an unprotected or protected model under a controlled BER:
 
 ```python
 from eject_error import inject_error_to_model
 
-inject_error_to_model(model, ber=BER, seed=SEEDS)
+inject_error_to_model(model, ber=BER, seed=SEED)
 ```
 
+### 2. Protect and recover with VHPS
 
-### VHPS
+Provide the model modules identified as vulnerable. VHPS applies its hybrid protection strategy to those modules:
 
 ```python
-from vhps_little_model import protect, recover  
+from vhps_little_model import protect, recover
 
+vulnerable_layers = ["YOUR_VULNERABLE_LAYERS"]
 
-protect(model, layer=["YOUR_VULNERABILITY_LAYERS"], device="cuda")
+protect(model, layer=vulnerable_layers, device="cuda")
 
+# Run fault injection or deploy the protected model here.
 
-recover(model, layer=["YOUR_VULNERABILITY_LAYERS"], device="cuda")
+recover(model, layer=vulnerable_layers, device="cuda")
 ```
 
-### ZMORP
+### 3. Use ZMORP independently
 
 ```python
 from zmorp_little_model import ZMORP
 
 ZMORP.protect_model(model)
-
 ZMORP.recover_model(model)
 ```
 
-### FRP
+### 4. Use FRP independently
 
 ```python
-from frp_little_model import FRP 
+from frp_little_model import FRP
 
 frp = FRP(device="cuda")
 frp.encode(model)
 frp.decode(model)
 ```
 
-## Requirements
+For large models, replace the `*_little_model` imports with their `*_large_model` counterparts.
 
-- Python 3.10+
-- PyTorch (with CUDA support recommended)
-- tqdm
+## Citation
+
+The paper is currently under submission. Citation information will be added after publication. In the meantime, please refer to the [submitted manuscript](./VHPS_TGRS_manuscript.pdf).
+
+## Contact
+
+For questions about the code or paper, please open an issue in this repository.
