@@ -16,7 +16,7 @@ VHPS protects a model according to the vulnerability of its modules instead of a
 
 - **ZMORP — Zero-Memory-Overhead Redundancy Protection.** Stores parity and redundant exponent information inside available mantissa bits, enabling exponent-error detection and recovery without increasing the parameter footprint.
 - **FRP — Full Redundancy Protection.** Encodes each protected weight into a longer codeword and can correct up to **three bit errors per codeword**.
-- **Vulnerability-aware hybrid protection.** Assigns FRP to the most vulnerable modules and ZMORP to moderately vulnerable modules, balancing robustness and storage cost.
+- **Vulnerability-aware hybrid protection strategy.** Assigns FRP to the most vulnerable modules and ZMORP to moderately vulnerable modules, balancing robustness and storage cost.
 
 ## Method at a Glance
 
