@@ -69,7 +69,7 @@ ZMORP.protect_model(model)
 ZMORP.recover_model(model)
 ```
 
-### Standalone FRP
+### FRP
 
 ```python
 from frp_little_model import FRP 
