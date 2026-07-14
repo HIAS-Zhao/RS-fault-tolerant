@@ -2,6 +2,12 @@
 
 This repository contains the PyTorch implementations accompanying **VHPS**, a hardware fault-tolerance framework for protecting neural network model weights against bit errors.
 
+## Paper
+
+Our paper, **"VHPS: A Vulnerability-Aware Hybrid Protection Framework for Space-Borne Remote Sensing Models,"** has been submitted to *IEEE Transactions on Geoscience and Remote Sensing (TGRS)*.
+
+The submitted manuscript is available here: [VHPS TGRS manuscript](./VHPS_TGRS_manuscript.pdf).
+
 ## Overview
 
 **VHPS** combines two complementary protection components:
