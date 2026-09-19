@@ -36,7 +36,7 @@ ASRP appends parity codes to the original weight representation. When radiation-
   <img src="assets/asrp.png" width="78%" alt="Full Redundancy Protection framework">
 </p>
 
-Together with module-level vulnerability analysis, ZMORP and FRP form the complete VHPS pipeline. Protection and recovery are performed entirely at the algorithm level and do not require hardware self-checking support.
+Together with module-level vulnerability analysis, ZMORP and ASRP form the complete VHPS pipeline. Protection and recovery are performed entirely at the algorithm level and do not require hardware self-checking support.
 
 ## Qualitative Results
 
@@ -51,14 +51,14 @@ The following examples cover four representative remote sensing tasks under a hi
 | File | Description |
 | --- | --- |
 | `eject_error.py` | Injects random bit errors into model weights for evaluation at a specified bit-error rate (BER). |
-| `zmorp_little_model.py` | Standalone ZMORP implementation for small models. |
-| `zmorp_large_model.py` | Standalone ZMORP implementation for large models. |
-| `frp_little_model.py` | Standalone FRP implementation for small models. |
-| `frp_large_model.py` | Standalone FRP implementation for large models. |
-| `vhps_little_model.py` | Combined VHPS pipeline for small models. |
-| `vhps_large_model.py` | Combined VHPS pipeline for large models. |
+| `ZMORP—SMALL/` | Standalone ZMORP implementation for small models. |
+| `ZMORP—LARGE/` | Standalone ZMORP implementation for large models. |
+| `ASRP-SMALL/` | Standalone ASRP implementation for small models. |
+| `ASRP-LARGE/` | Standalone ASRP implementation for large models. |
+| `VHPS-SMALL/` | Combined VHPS pipeline for small models. |
+| `VHPS-LARGE` | Combined VHPS pipeline for large models. |
 
-Use the `little` implementation for smaller networks and the `large` implementation for models that require the corresponding large-model protection path.
+Use the `SMALL` implementation for smaller networks and the `LARGE` implementation for models that require the corresponding large-model protection path.
 
 ## Requirements
 
@@ -87,39 +87,49 @@ inject_error_to_model(model, ber=BER)
 ### 2. Protect and recover with VHPS
 
 Provide the model modules identified as vulnerable. VHPS applies its hybrid protection strategy to those modules:
+### 
 
 ```python
-from vhps_little_model import protect, recover
 
-vulnerable_layers = ["YOUR_VULNERABLE_LAYERS"]
+from vhps_large import VHPSLarge
 
-protect(model, layer=vulnerable_layers, device="cuda")
+vhps = VHPSLarge(layer_prefixes=["layers.0."])  
+vhps.protect(model)                           
+vhps.inject(model, ber=1e-5, seed=100)        
+stats = vhps.decode(model)                    
 
-# Run fault injection or deploy the protected model here.
-
-recover(model, layer=vulnerable_layers, device="cuda")
 ```
+
 
 ### 3. Use ZMORP independently
 
 ```python
-from zmorp_little_model import ZMORP
+   
+from zmorp_large import ZMORPLarge           
 
-ZMORP.protect_model(model)
-ZMORP.recover_model(model)
+zmorp = ZMORPLarge()                          
+zmorp.protect(model)                          
+zmorp.inject(model, ber=1e-4, seed=42)
+zmorp.recover(model)
 ```
 
-### 4. Use FRP independently
+
+
+### 4. Use ASRP independently
+
+### 
 
 ```python
-from frp_little_model import FRP
+            
+from asrp_large import ASRPLarge              
 
-frp = FRP(device="cuda")
-frp.encode(model)
-frp.decode(model)
+asrp = ASRPLarge()                            
+asrp.protect(model)                           
+asrp.inject(model, ber=1e-5, seed=100)
+stats = asrp.decode(model)
 ```
 
-For large models, replace the `*_little_model` imports with their `*_large_model` counterparts.
+### 
 
 ## Citation
 
