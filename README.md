@@ -33,7 +33,7 @@ ZMORP reuses selected mantissa bits to hold lightweight error-correction informa
 ASRP appends parity codes to the original weight representation. When radiation-induced bit flips corrupt the stored codeword, the decoder uses this redundancy to correct the errors and recover the protected parameter.
 
 <p align="center">
-  <img src="assets/asrp.png" width="78%" alt="Full Redundancy Protection framework">
+  <img src="assets/asrp-frame.png" width="78%" alt="Full Redundancy Protection framework">
 </p>
 
 Together with module-level vulnerability analysis, ZMORP and ASRP form the complete VHPS pipeline. Protection and recovery are performed entirely at the algorithm level and do not require hardware self-checking support.
