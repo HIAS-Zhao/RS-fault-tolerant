@@ -15,8 +15,8 @@ Neural networks deployed on satellites operate in radiation-prone environments. 
 VHPS protects a model according to the vulnerability of its modules instead of applying the same level of redundancy everywhere. It combines two complementary mechanisms:
 
 - **ZMORP — Zero-Memory-Overhead Redundancy Protection.** Stores parity and redundant exponent information inside available mantissa bits, enabling exponent-error detection and recovery without increasing the parameter footprint.
-- **FRP — Full Redundancy Protection.** Encodes each protected weight into a longer codeword and can correct up to **three bit errors per codeword**.
-- **Vulnerability-aware hybrid protection strategy.** Assigns FRP to the most vulnerable modules and ZMORP to moderately vulnerable modules, balancing robustness and storage cost.
+- **ASRP — Adaptive Semi-Redundant Protection.** a coding-theoretic approach delivering provable multi-bit error correction with bounded overhead.
+- **Vulnerability-aware hybrid protection strategy.** Assigns ASRP to the most vulnerable modules and ZMORP to moderately vulnerable modules, balancing robustness and storage cost.
 
 ## Method at a Glance
 
@@ -28,12 +28,12 @@ ZMORP reuses selected mantissa bits to hold lightweight error-correction informa
   <img src="assets/zmorp-framework.png" width="100%" alt="Zero-Memory-Overhead Redundancy Protection framework">
 </p>
 
-### FRP
+### ASRP
 
-FRP appends parity codes to the original weight representation. When radiation-induced bit flips corrupt the stored codeword, the decoder uses this redundancy to correct the errors and recover the protected parameter.
+ASRP appends parity codes to the original weight representation. When radiation-induced bit flips corrupt the stored codeword, the decoder uses this redundancy to correct the errors and recover the protected parameter.
 
 <p align="center">
-  <img src="assets/frp-framework-diagram.png" width="78%" alt="Full Redundancy Protection framework">
+  <img src="assets/asrp.png" width="78%" alt="Full Redundancy Protection framework">
 </p>
 
 Together with module-level vulnerability analysis, ZMORP and FRP form the complete VHPS pipeline. Protection and recovery are performed entirely at the algorithm level and do not require hardware self-checking support.
